@@ -1,0 +1,17 @@
+cloudscraper==1.2.71
+instructor==1.9.0
+openai==1.93.0
+pydantic==2.11.7
+pytest==8.3.5
+PyYAML==6.0.2
+Requests==2.32.4
+uvicorn==0.34.3
+SQLAlchemy==2.0.30
+ichatbio-sdk==0.2.1
+typing_extensions>=4.0.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+langchain-openai>=0.2.0
+langchainhub>=0.1.15
+langgraph>=0.1.0
