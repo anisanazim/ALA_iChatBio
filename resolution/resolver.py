@@ -4,7 +4,7 @@ import asyncio
 import json
 import logging
 from typing import Any, Dict, Optional
-from ala_logic import NameMatchingSearchParams
+from ala_logic import NameMatchingSearchParams, search_vernacular_name, search_scientific_name
 
 from resolution.models import ResolvedSpecies, ResolutionResult
 
@@ -137,7 +137,6 @@ class ALAParameterResolver:
             return False
         return (
             d.get("matchType") == "vernacularMatch"
-            and d.get("nameType") in ["INFORMAL", "COMMON"]
         )
 
     def _is_valid_scientific(self, d: Optional[Dict]) -> bool:
@@ -145,17 +144,16 @@ class ALAParameterResolver:
             return False
         if d.get("issues") == ["noMatch"]:
             return False
-        if d.get("nameType") not in ["SCIENTIFIC", "DOUBTFUL"]:
-            return False
         return d.get("matchType") in [
             "exactMatch",
             "phraseMatch",
             "taxonIdMatch",
             "higherMatch",
+            "vernacularMatch",
         ]
 
     # -------------------------------------------------------------------------
-    # Core resolution — single species name → raw ALA record
+    # Core resolution - single species name → raw ALA record
     # -------------------------------------------------------------------------
 
     async def resolve_species_name(self, name: str) -> Optional[Dict[str, Any]]:
@@ -168,7 +166,7 @@ class ALAParameterResolver:
             logger.warning(f"CACHE HIT: Resolved '{name}' from Redis")
             return cached
 
-        # LSID passthrough — not in cache, return minimal record
+        # LSID passthrough - not in cache, return minimal record
         if self._is_lsid(name):
             logger.warning(f"LSID not cached, returning minimal record: {name}")
             return {
@@ -201,8 +199,8 @@ class ALAParameterResolver:
             await self._store_full_response(name, sci_data)
             return sci_data
 
-        # No valid match — negative cache
-        logger.warning(f"NO MATCH: '{name}' not found — caching negative result")
+        # No valid match - negative cache
+        logger.warning(f"NO MATCH: '{name}' not found - caching negative result")
         await self._redis_set(self._key_no_match(name), {"noMatch": True})
         return None
 
@@ -224,12 +222,12 @@ class ALAParameterResolver:
                 ),
             )
 
-        # Warn if resolved at genus level — taxaCount will count entire genus
+        # Warn if resolved at genus level - taxaCount will count entire genus
         rank = record.get("rank")
         if rank and rank.lower() == "genus":
             logger.warning(
                 f"[RESOLVER] '{name}' resolved to genus '{record.get('scientificName')}' "
-                f"— taxa count will include all species in this genus"
+                f"- taxa count will include all species in this genus"
             )
 
         return ResolvedSpecies(
