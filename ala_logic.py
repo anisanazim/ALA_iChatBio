@@ -48,10 +48,10 @@ class ALA:
         url = f"{self.ala_api_base_url}/namematching/api/search?{query_string}"
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, lambda: self.execute_request(url))
-
+    
     async def search_vernacular_name(self, params: NameMatchingSearchParams) -> dict:
         """Search for a vernacular/common name using the namematching API."""
-        query_string = urlencode({"q": params.q})
+        query_string = urlencode({"vernacularName": params.q})
         url = f"{self.ala_api_base_url}/namematching/api/searchByVernacularName?{query_string}"
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, lambda: self.execute_request(url))
