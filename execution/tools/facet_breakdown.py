@@ -80,7 +80,7 @@ async def run_facet_breakdown(context, ala_logic, params: OccurrenceFacetsParams
             await process.create_artifact(
                 mimetype="application/json",
                 description=(
-                    f"Occurrence breakdown — {total_values} values "
+                    f"Occurrence breakdown - {total_values} values "
                     f"across {len(facet_fields)} fields"
                 ),
                 uris=[api_url],
@@ -105,7 +105,7 @@ async def run_facet_breakdown(context, ala_logic, params: OccurrenceFacetsParams
                 summary += "."
             else:
                 summary = (
-                    "No facet data found — this may indicate "
+                    "No facet data found - this may indicate "
                     "no matching records for this query."
                 )
 

@@ -19,7 +19,7 @@ async def run_distribution(
     """
     Execute species distribution lookup and stream results to context.
 
-    The distribution API returns imageUrl directly in the response —
+    The distribution API returns imageUrl directly in the response -
     no separate image fetch call needed.
 
     Args:
@@ -51,7 +51,7 @@ async def run_distribution(
                 await context.reply(
                     f"No expert distribution maps are available for **{species_name}** "
                     f"in the ALA spatial service. This means no expert-compiled range "
-                    f"maps have been created yet — not that the species doesn't exist. "
+                    f"maps have been created yet - not that the species doesn't exist. "
                     f"Try searching occurrence records for observed sighting locations."
                 )
                 return
@@ -79,7 +79,7 @@ async def run_distribution(
             await process.create_artifact(
                 mimetype="application/json",
                 description=(
-                    f"Expert spatial distribution for {species_name} — "
+                    f"Expert spatial distribution for {species_name} - "
                     f"{distribution_count} area(s)"
                 ),
                 uris=[api_url],

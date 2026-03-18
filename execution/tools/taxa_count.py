@@ -67,7 +67,7 @@ async def run_taxa_count(context, ala_logic, params: OccurrenceTaxaCountParams) 
             await process.create_artifact(
                 mimetype="application/json",
                 description=(
-                    f"Taxa occurrence counts — {taxa_with_records} of {guid_count} taxa, "
+                    f"Taxa occurrence counts - {taxa_with_records} of {guid_count} taxa, "
                     f"{total_occurrences:,} total occurrences"
                 ),
                 uris=[api_url],

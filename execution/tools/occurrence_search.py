@@ -44,7 +44,7 @@ async def run_occurrence_search(context, ala_logic, params: OccurrenceSearchPara
 
             await process.create_artifact(
                 mimetype="application/json",
-                description=f"ALA occurrence records — {returned} of {total:,} total",
+                description=f"ALA occurrence records - {returned} of {total:,} total",
                 uris=[api_url],
                 content=json.dumps(raw_response).encode("utf-8"),
                 metadata={

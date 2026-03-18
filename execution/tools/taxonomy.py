@@ -77,7 +77,7 @@ async def run_taxonomy(context, ala_logic, params: SpeciesBieSearchParams, extra
             await process.create_artifact(
                 mimetype="application/json",
                 description=(
-                    f"BIE species information for '{params.q}' — "
+                    f"BIE species information for '{params.q}' - "
                     f"{results_count} of {total_records} results"
                 ),
                 uris=[api_url],

@@ -31,8 +31,8 @@ class ALAExecutor:
     call the correct tool function and stream results to context.
 
     Execution phases:
-        Phase 1 — must_call tools: if any fails, stop immediately
-        Phase 2 — optional tools:  if any fails, log and continue
+        Phase 1 - must_call tools: if any fails, stop immediately
+        Phase 2 - optional tools:  if any fails, log and continue
     """
 
     def __init__(self, ala_logic):
@@ -51,10 +51,10 @@ class ALAExecutor:
 
         Args:
             context:    iChatBio ResponseContext
-            plan:       PlannerOutput — provides tool priority order
+            plan:       PlannerOutput - provides tool priority order
             routed:     Dict of tool_name → typed API params (from ALARouter)
-            extraction: ExtractionResult — used for display names etc.
-            resolution: ResolutionResult — used to get species display names
+            extraction: ExtractionResult - used for display names etc.
+            resolution: ResolutionResult - used to get species display names
         """
         intent = plan.intent
         logger.warning(f"[EXECUTOR] Starting execution for intent: {intent}")
@@ -67,7 +67,7 @@ class ALAExecutor:
         executed = []
 
         # ---------------------------------------------------------------
-        # PHASE 1: must_call tools — stop on first failure
+        # PHASE 1: must_call tools - stop on first failure
         # ---------------------------------------------------------------
         async with context.begin_process("Executing planned tools") as process:
             await process.log(
@@ -79,15 +79,15 @@ class ALAExecutor:
                 tool_name = tool_plan.tool_name
 
                 if tool_name in executed:
-                    await process.log(f"Skipping '{tool_name}' — already executed")
+                    await process.log(f"Skipping '{tool_name}' - already executed")
                     continue
 
                 params = routed.get(tool_name)
                 if params is None:
-                    await process.log(f"No routed params for '{tool_name}' — skipping")
+                    await process.log(f"No routed params for '{tool_name}' - skipping")
                     continue
 
-                await process.log(f"Executing: {tool_name} — {tool_plan.reason}")
+                await process.log(f"Executing: {tool_name} - {tool_plan.reason}")
 
                 try:
                     await self._call_tool(context, tool_name, params, extraction, resolution)
@@ -100,10 +100,10 @@ class ALAExecutor:
                     await context.reply(
                         f"A required operation failed and the request could not be completed: {e}"
                     )
-                    return  # Stop — don't execute optional tools
+                    return  # Stop - don't execute optional tools
 
             # ---------------------------------------------------------------
-            # PHASE 2: optional tools — log failures and continue
+            # PHASE 2: optional tools - log failures and continue
             # ---------------------------------------------------------------
             if optional:
                 await process.log(f"Phase 2: {len(optional)} optional tool(s)")
@@ -112,15 +112,15 @@ class ALAExecutor:
                     tool_name = tool_plan.tool_name
 
                     if tool_name in executed:
-                        await process.log(f"Skipping '{tool_name}' — already executed")
+                        await process.log(f"Skipping '{tool_name}' - already executed")
                         continue
 
                     params = routed.get(tool_name)
                     if params is None:
-                        await process.log(f"No routed params for '{tool_name}' — skipping")
+                        await process.log(f"No routed params for '{tool_name}' - skipping")
                         continue
 
-                    await process.log(f"Executing optional: {tool_name} — {tool_plan.reason}")
+                    await process.log(f"Executing optional: {tool_name} - {tool_plan.reason}")
 
                     try:
                         await self._call_tool(context, tool_name, params, extraction, resolution)
@@ -130,7 +130,7 @@ class ALAExecutor:
                     except Exception as e:
                         logger.warning(f"[EXECUTOR] optional '{tool_name}' failed: {e}")
                         await process.log(f"Optional '{tool_name}' failed (continuing): {e}")
-                        # Do not return — keep going
+                        # Do not return - keep going
 
             await process.log(
                 f"Execution complete: {len(executed)} tool(s) executed"
@@ -166,7 +166,7 @@ class ALAExecutor:
 
         elif tool_name == "lookup_species_info":
             assert isinstance(params, SpeciesBieSearchParams)
-            await run_taxonomy(context, ala, params)
+            await run_taxonomy(context, ala, params, extraction)
 
         elif tool_name == "get_species_distribution":
             assert isinstance(params, SpatialDistributionByLsidParams)
