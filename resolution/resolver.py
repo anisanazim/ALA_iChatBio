@@ -4,7 +4,7 @@ import asyncio
 import json
 import logging
 from typing import Any, Dict, Optional
-from ala_logic import NameMatchingSearchParams, search_vernacular_name, search_scientific_name
+from ala_logic import NameMatchingSearchParams
 
 from resolution.models import ResolvedSpecies, ResolutionResult
 
