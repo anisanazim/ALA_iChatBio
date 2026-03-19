@@ -1,19 +1,47 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 
 # Virtual environments
 venv/
+.env
+.env.*
+*.env
 
-# Distribution / packaging
+# Bytecode
+*.pyo
+*.pyd
+
+
+# Local config files
+config.yaml
+env.yaml
+secrets.yaml
+
+# Logs
+*.log
+logs/
+
+# Temp files
+tmp/
+temp/
+
+# Packaging / Build
 build/
 dist/
 *.egg-info/
+.eggs/
 
-# IDE/editor settings
+# Docker
+docker-cache/
+.dockerignore
+
+# Editors / IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS files
 .DS_Store
