@@ -1,0 +1,418 @@
+[
+  {
+    "id": "occ_001",
+    "stage": "planner",
+    "intent": "occurrence_search",
+    "query": "Show me koala sightings in Queensland",
+    "expected": {
+      "intent": "occurrence_search",
+      "tools": ["search_species_occurrences"],
+      "species_mentioned": ["koala"],
+      "requires_lsid": false,
+      "query_type": "single_species"
+    }
+  },
+  {
+    "id": "occ_002",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Show me koala sightings in Queensland",
+    "expected": {
+      "species": "koala",
+      "state": "Queensland",
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "occ_003",
+    "stage": "planner",
+    "intent": "occurrence_search",
+    "query": "Find platypus observations near Sydney within 50km since 2020 with photos",
+    "expected": {
+      "intent": "occurrence_search",
+      "tools": ["search_species_occurrences"],
+      "species_mentioned": ["platypus"],
+      "requires_lsid": false,
+      "query_type": "single_species"
+    }
+  },
+  {
+    "id": "occ_004",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Find platypus observations near Sydney within 50km since 2020 with photos",
+    "expected": {
+      "species": "platypus",
+      "city": "Sydney",
+      "radius": 50,
+      "year_from": 2021,
+      "has_images": true,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "occ_005",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Show me preserved specimens of Eucalyptus regnans before 2000",
+    "expected": {
+      "species": "Eucalyptus regnans",
+      "year_to": 1999,
+      "basis_of_record": "PRESERVED_SPECIMEN",
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "occ_006",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Wombat sightings in summer in Victoria",
+    "expected": {
+      "species": "wombat",
+      "state": "Victoria",
+      "months": [12, 1, 2],
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "occ_007",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Koala records between 2015 and 2020",
+    "expected": {
+      "species": "koala",
+      "year_from": 2015,
+      "year_to": 2020,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "occ_008",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Show me rainbow bee-eater sightings in the last 5 years",
+    "expected": {
+      "species": "rainbow bee-eater",
+      "relative_years": 5,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "occ_009",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Show me only records with coordinates for eastern grey kangaroo",
+    "expected": {
+      "species": "eastern grey kangaroo",
+      "has_coordinates": true,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "fac_001",
+    "stage": "planner",
+    "intent": "facet_breakdown",
+    "query": "Break down koala records by state",
+    "expected": {
+      "intent": "facet_breakdown",
+      "tools": ["get_occurrence_breakdown"],
+      "requires_lsid": false,
+      "query_type": "single_species"
+    }
+  },
+  {
+    "id": "fac_002",
+    "stage": "extractor",
+    "intent": "facet_breakdown",
+    "query": "Break down koala records by state",
+    "expected": {
+      "species": "koala",
+      "facets": ["state"],
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "fac_003",
+    "stage": "extractor",
+    "intent": "facet_breakdown",
+    "query": "What are the top 10 species recorded in Queensland?",
+    "expected": {
+      "facets": ["species"],
+      "state": "Queensland",
+      "flimit": 10,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "fac_004",
+    "stage": "extractor",
+    "intent": "facet_breakdown",
+    "query": "Which months have the most wombat sightings?",
+    "expected": {
+      "species": "wombat",
+      "facets": ["month"],
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "fac_005",
+    "stage": "extractor",
+    "intent": "facet_breakdown",
+    "query": "Compare koala records across states and years",
+    "expected": {
+      "species": "koala",
+      "facets": ["state", "year"],
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "fac_006",
+    "stage": "extractor",
+    "intent": "facet_breakdown",
+    "query": "Break down platypus records by record type",
+    "expected": {
+      "species": "platypus",
+      "facets": ["basis_of_record"],
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "fac_007",
+    "stage": "planner",
+    "intent": "facet_breakdown",
+    "query": "Top species in the vicinity of Canberra",
+    "expected": {
+      "intent": "facet_breakdown",
+      "tools": ["get_occurrence_breakdown"],
+      "requires_lsid": false,
+      "query_type": "no_species"
+    }
+  },
+  {
+    "id": "tax_count_001",
+    "stage": "planner",
+    "intent": "taxa_count",
+    "query": "How many koala records are in ALA?",
+    "expected": {
+      "intent": "taxa_count",
+      "tools": ["get_occurrence_taxa_count"],
+      "species_mentioned": ["koala"],
+      "requires_lsid": true,
+      "query_type": "single_species"
+    }
+  },
+  {
+    "id": "tax_count_002",
+    "stage": "extractor",
+    "intent": "taxa_count",
+    "query": "How many koala records are in ALA?",
+    "expected": {
+      "species": ["koala"],
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "tax_count_003",
+    "stage": "extractor",
+    "intent": "taxa_count",
+    "query": "How many koala and wombat records exist in Queensland?",
+    "expected": {
+      "species": ["koala", "wombat"],
+      "state": "Queensland",
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "tax_count_004",
+    "stage": "extractor",
+    "intent": "taxa_count",
+    "query": "How many platypus records are there since 2020?",
+    "expected": {
+      "species": ["platypus"],
+      "year_from": 2021,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "tax_count_005",
+    "stage": "planner",
+    "intent": "taxa_count",
+    "query": "Taxonomic count of Tasmanian devils",
+    "expected": {
+      "intent": "taxa_count",
+      "tools": ["get_occurrence_taxa_count"],
+      "requires_lsid": true,
+      "query_type": "single_species"
+    }
+  },
+  {
+    "id": "taxon_001",
+    "stage": "planner",
+    "intent": "taxonomy",
+    "query": "Tell me about the koala",
+    "expected": {
+      "intent": "taxonomy",
+      "tools": ["lookup_species_info"],
+      "requires_lsid": false,
+       "query_type": "single_species"
+    }
+  },
+  {
+    "id": "taxon_002",
+    "stage": "extractor",
+    "intent": "taxonomy",
+    "query": "Tell me about the koala",
+    "expected": {
+      "species": "koala",
+      "include_image": false,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "taxon_003",
+    "stage": "extractor",
+    "intent": "taxonomy",
+    "query": "Show me an image of the platypus",
+    "expected": {
+      "species": "platypus",
+      "include_image": true,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "taxon_004",
+    "stage": "extractor",
+    "intent": "taxonomy",
+    "query": "What family does the Tasmanian devil belong to?",
+    "expected": {
+      "species": "Tasmanian devil",
+      "include_image": false,
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "taxon_005",
+    "stage": "planner",
+    "intent": "taxonomy",
+    "query": "Image of the platypus",
+    "expected": {
+      "intent": "taxonomy",
+      "tools": ["lookup_species_info"],
+      "requires_lsid": false,
+      "query_type": "single_species"
+    }
+  },
+  {
+    "id": "dist_001",
+    "stage": "planner",
+    "intent": "distribution",
+    "query": "Show me the distribution map for the koala",
+    "expected": {
+      "intent": "distribution",
+      "tools": ["get_species_distribution"],
+      "species_mentioned": ["koala"],
+      "requires_lsid": true,
+      "query_type": "single_species"
+    }
+  },
+  {
+    "id": "dist_002",
+    "stage": "extractor",
+    "intent": "distribution",
+    "query": "Show me the distribution map for the koala",
+    "expected": {
+      "species": "koala",
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "dist_003",
+    "stage": "extractor",
+    "intent": "distribution",
+    "query": "What is the geographic range of the platypus?",
+    "expected": {
+      "species": "platypus",
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "dist_004",
+    "stage": "planner",
+    "intent": "distribution",
+    "query": "Where does the Tasmanian devil live in Australia?",
+    "expected": {
+      "intent": "distribution",
+      "tools": ["get_species_distribution"],
+      "requires_lsid": true,
+      "query_type": "single_species"
+
+    }
+  },
+  {
+    "id": "edge_001",
+    "stage": "planner",
+    "intent": "out_of_scope",
+    "query": "What is the weather in Sydney today?",
+    "expected": {
+      "intent": "out_of_scope",
+       "tools": [],
+       "query_type": "no_species"
+
+    }
+  },
+  {
+    "id": "edge_002",
+    "stage": "planner",
+    "intent": "out_of_scope",
+    "query": "Write me a poem about kangaroos",
+    "expected": {
+      "intent": "out_of_scope",
+      "tools": [],
+      "query_type": "no_species"
+    }
+  },
+  {
+    "id": "edge_003",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Show me sightings in winter in New South Wales",
+    "expected": {
+      "state": "New South Wales",
+      "months": [6, 7, 8],
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "edge_004",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Show me koala records in QLD",
+    "expected": {
+      "species": "koala",
+      "state": "Queensland",
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "edge_005",
+    "stage": "extractor",
+    "intent": "facet_breakdown",
+    "query": "Break down wombat records by families",
+    "expected": {
+      "species": "wombat",
+      "facets": ["family"],
+      "clarification_needed": false
+    }
+  },
+  {
+    "id": "edge_006",
+    "stage": "extractor",
+    "intent": "occurrence_search",
+    "query": "Show me the last 10 koala records",
+    "expected": {
+      "species": "koala",
+      "page_size": 10,
+      "clarification_needed": false
+    }
+  }
+]
