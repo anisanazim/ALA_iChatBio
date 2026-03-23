@@ -22,10 +22,10 @@ class SpeciesBieSearchParams(BaseModel):
         description="The number of records to return",
         ge=1, le=100, examples=[5, 10, 20]
     )
-    
-    sort: Optional[str] = Field("commonNameSingle",
-        description="The field to sort the records by",
-        examples=["commonNameSingle", "score", "scientificName", "rank"]
+
+    sort: Optional[str] = Field("score",
+    description="The field to sort the records by",
+    examples=["score", "commonNameSingle", "scientificName", "rank"]
     )
     
     dir: Optional[str] = Field("desc",
