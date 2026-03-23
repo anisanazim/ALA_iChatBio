@@ -33,12 +33,16 @@ async def run_taxonomy(context, ala_logic, params: SpeciesBieSearchParams, extra
 
         try:
             loop = asyncio.get_event_loop()
-            raw_response = await loop.run_in_executor(
-                None, lambda: ala_logic.execute_request(api_url)
+            raw_response = await asyncio.wait_for(
+                loop.run_in_executor(
+                    None, lambda: ala_logic.execute_request(api_url)
+                ),
+                timeout=30.0
             )
 
             await process.log("Retrieved BIE data")
 
+            # Extract results
             total_records = 0
             results_count = 0
             sample_results = []
@@ -50,9 +54,11 @@ async def run_taxonomy(context, ala_logic, params: SpeciesBieSearchParams, extra
                 results = search_results.get("results", [])
                 results_count = len(results)
 
-                # Extract image URL from first result — imageUrl only, not image UUID
+                # Extract primary image from first result
                 if results and isinstance(results[0], dict):
-                    primary_image_url = results[0].get("imageUrl")
+                    primary_image_url = (
+                        results[0].get("imageUrl") or results[0].get("image")
+                    )
 
                 for result in results[:3]:
                     if isinstance(result, dict):
@@ -82,6 +88,7 @@ async def run_taxonomy(context, ala_logic, params: SpeciesBieSearchParams, extra
                     "filter_applied": params.fq,
                     "results_returned": results_count,
                     "total_records": total_records,
+                    "primary_image_url": primary_image_url,
                     "retrieval_date": datetime.now().strftime("%Y-%m-%d"),
                 }
             )
@@ -94,22 +101,13 @@ async def run_taxonomy(context, ala_logic, params: SpeciesBieSearchParams, extra
                     summary += f". Top results: {', '.join(sample_results)}"
                     if results_count > 3:
                         summary += f" and {results_count - 3} more"
+                if extraction.include_image and primary_image_url:
+                    summary += f"\n\nImage: {primary_image_url}"
                 summary += "."
             else:
                 summary = f"No species information found in the BIE for '{params.q}'."
 
             await context.reply(summary)
-
-            # Image artifact created on context after reply — outside process block scope
-            if extraction.include_image and primary_image_url:
-                await context.create_artifact(
-                    mimetype="image/jpeg",
-                    description=f"Representative image for '{params.q}'",
-                    uris=[primary_image_url],
-                )
-
-        except asyncio.CancelledError:
-            raise
 
         except asyncio.TimeoutError:
             await process.log("BIE API timed out after 30s")
