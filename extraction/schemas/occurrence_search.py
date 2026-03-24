@@ -114,6 +114,14 @@ class OccurrenceSearchExtraction(ExtractionBase):
 
     # --- Taxonomic filters ---
     kingdom: Optional[str] = Field(None, description="Taxonomic kingdom. Extract only if explicitly mentioned.")
+    classs: Optional[str] = Field(
+    None,
+    description=(
+        "Taxonomic class. Extract only if user mentions a broad group. "
+        "birds→Aves, mammals→Mammalia, reptiles→Reptilia, "
+        "fish→Actinopterygii, frogs/amphibians→Amphibia, insects→Insecta."
+    )
+    )
     family:  Optional[str] = Field(None, description="Taxonomic family. Extract only if explicitly mentioned.")
     genus:   Optional[str] = Field(None, description="Taxonomic genus. Extract only if explicitly mentioned.")
 
@@ -124,6 +132,15 @@ class OccurrenceSearchExtraction(ExtractionBase):
         ge=1, le=1000
     )
 
+    image_count: Optional[int] = Field(
+    None,
+    description=(
+        "Number of images to display. Extract from 'show me 5 photos', "
+        "'I want to see 10 images' etc. Only set when has_images=True."
+    ),
+    ge=1, le=20
+    )
+    
     @model_validator(mode="after")
     def validate_temporal_consistency(self) -> "OccurrenceSearchExtraction":
         has_temporal_field = any([

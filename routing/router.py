@@ -157,6 +157,8 @@ def _route_occurrence_search(
     # Taxonomic filters
     if extraction.kingdom:
         fq_filters.append(f"kingdom:{extraction.kingdom}")
+    if extraction.classs:
+        fq_filters.append(f"class:{extraction.classs}")
     if extraction.family:
         fq_filters.append(f"family:{extraction.family}")
     if extraction.genus:

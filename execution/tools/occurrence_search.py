@@ -5,19 +5,21 @@ import json
 import logging
 from datetime import datetime
 
+from extraction.schemas.occurrence_search import OccurrenceSearchExtraction
 from models.occurrence import OccurrenceSearchParams
 
 logger = logging.getLogger(__name__)
 
 
-async def run_occurrence_search(context, ala_logic, params: OccurrenceSearchParams) -> None:
+async def run_occurrence_search(context, ala_logic, params: OccurrenceSearchParams, extraction: OccurrenceSearchExtraction) -> None:
     """
     Execute occurrence search and stream results to context.
 
     Args:
-        context:   iChatBio ResponseContext
-        ala_logic: ALA HTTP layer
-        params:    Typed API params from router
+        context:    iChatBio ResponseContext
+        ala_logic:  ALA HTTP layer
+        params:     Typed API params from router
+        extraction: Typed extraction result - used for image_count flag
     """
     async with context.begin_process("Searching for ALA occurrences") as process:
         await process.log(
@@ -38,9 +40,28 @@ async def run_occurrence_search(context, ala_logic, params: OccurrenceSearchPara
             )
 
             total = raw_response.get("totalRecords", 0)
-            returned = len(raw_response.get("occurrences", []))
+            occurrences = raw_response.get("occurrences", [])
+            returned = len(occurrences)
 
             await process.log(f"Found {total:,} total records, returning {returned}")
+
+            # Extract image URLs if user requested images
+            image_urls = []
+            if extraction.has_images or extraction.image_count:
+                for occ in occurrences:
+                    image_url = occ.get("largeImageUrl") or occ.get("imageUrl")
+                    if image_url:
+                        image_urls.append({
+                            "url": image_url,
+                            "scientificName": occ.get("scientificName"),
+                            "vernacularName": occ.get("vernacularName"),
+                            "stateProvince": occ.get("stateProvince"),
+                            "eventDate": occ.get("eventDate"),
+                            "recordedBy": occ.get("recordedBy"),
+                        })
+                    limit = extraction.image_count or 3
+                    if len(image_urls) >= limit:
+                        break
 
             await process.create_artifact(
                 mimetype="application/json",
@@ -53,13 +74,25 @@ async def run_occurrence_search(context, ala_logic, params: OccurrenceSearchPara
                     "search_params": params.model_dump(exclude_none=True),
                     "data_source": "Atlas of Living Australia",
                     "retrieval_date": datetime.now().strftime("%Y-%m-%d"),
+                    "image_count": len(image_urls),
                 }
             )
 
-            await context.reply(
-                f"Found {total:,} occurrence records. "
-                f"Returning {returned} in the artifact."
-            )
+            # Create individual image artifacts
+            for img in image_urls:
+                label = img.get("vernacularName") or img.get("scientificName") or "Species"
+                state = img.get("stateProvince", "")
+                await process.create_artifact(
+                    mimetype="image/jpeg",
+                    description=f"{label}{' - ' + state if state else ''}",
+                    uris=[img["url"]],
+                )
+
+            summary = f"Found {total:,} occurrence records. Returning {returned} in the artifact."
+            if image_urls:
+                summary += f" Showing {len(image_urls)} image{'s' if len(image_urls) > 1 else ''}."
+
+            await context.reply(summary)
 
         except asyncio.TimeoutError:
             await process.log("Request timed out after 30s")

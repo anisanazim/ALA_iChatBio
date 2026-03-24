@@ -154,7 +154,7 @@ class ALAExecutor:
 
         if tool_name == "search_species_occurrences":
             assert isinstance(params, OccurrenceSearchParams)
-            await run_occurrence_search(context, ala, params)
+            await run_occurrence_search(context, ala, params, extraction)
 
         elif tool_name == "get_occurrence_breakdown":
             assert isinstance(params, OccurrenceFacetsParams)
