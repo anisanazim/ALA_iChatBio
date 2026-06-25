@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 import redis.asyncio as aioredis
 from openai import AsyncOpenAI
@@ -19,7 +19,7 @@ from extraction.extractor import ALAExtractor
 from resolution.resolver import ALAParameterResolver
 from routing.router import ALARouter
 from execution.executor import ALAExecutor
-from common.config import get_config_value
+from common.config import get_config_value, update_llm_credentials
 
 from instructor.exceptions import InstructorRetryException
 
@@ -56,24 +56,27 @@ class ALAAgent(IChatBioAgent):
 
     def __init__(self):
         # Infrastructure
-        openai_client = AsyncOpenAI(
-            api_key=get_config_value("OPENAI_API_KEY"),
-            base_url=get_config_value(
-                "OPENAI_BASE_URL", "https://api.ai.it.ufl.edu"
-            ),
+        self.openai_base_url = get_config_value(
+            "OPENAI_BASE_URL", "https://api.ai.it.ufl.edu"
         )
         redis_client = aioredis.from_url(
             "redis://localhost:6379",
             decode_responses=True
         )
         ala_logic = ALA()
-
-        # Pipeline components
-        self.planner  = ALAPlanner(openai_client)
-        self.extractor = ALAExtractor(openai_client)
         self.resolver  = ALAParameterResolver(ala_logic, redis_client)
         self.router    = ALARouter()
         self.executor  = ALAExecutor(ala_logic)
+
+    def _build_openai_client(self) -> AsyncOpenAI | None:
+        api_key = get_config_value("OPENAI_API_KEY")
+        if not api_key:
+            return None
+
+        return AsyncOpenAI(
+            api_key=api_key,
+            base_url=self.openai_base_url,
+        )
 
     @override
     def get_agent_card(self) -> AgentCard:
@@ -105,6 +108,7 @@ class ALAAgent(IChatBioAgent):
         request: str,
         entrypoint: str,
         params: UnifiedALAParams,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """
         Execute the full pipeline for a user query.
@@ -119,17 +123,23 @@ class ALAAgent(IChatBioAgent):
         """
         logger.warning(f"[AGENT] Query: {request}")
 
-        if not get_config_value("OPENAI_API_KEY"):
+        update_llm_credentials(metadata)
+
+        openai_client = self._build_openai_client()
+        if openai_client is None:
             await context.reply(
                 "Configuration error: OpenAI API key not found."
             )
             return
 
+        planner = ALAPlanner(openai_client)
+        extractor = ALAExtractor(openai_client)
+
         # ------------------------------------------------------------------
         # STEP 1: PLAN
         # ------------------------------------------------------------------
         try:
-            plan = await self.planner.plan(request)
+            plan = await planner.plan(request)
         except Exception as e:
             logger.error(f"[AGENT] Planner failed: {e}")
             await context.reply(
@@ -158,7 +168,7 @@ class ALAAgent(IChatBioAgent):
         # STEP 2: EXTRACT
         # ------------------------------------------------------------------
         try:
-            extraction = await self.extractor.extract(request, plan)
+            extraction = await extractor.extract(request, plan)
         except InstructorRetryException as e:
             logger.error(f"[AGENT] Extractor failed after retries: {e}")
             await context.reply(
